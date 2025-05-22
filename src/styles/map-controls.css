@@ -1,0 +1,36 @@
+/* button container (zoom, geolocation) */
+.maplibregl-ctrl-group {
+  background: rgba(0, 0, 0, 0.05) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 12px;
+  overflow: hidden;
+
+  /* (optional) enable these if you want borders or shadow */
+  /* border: 1px solid rgba(255, 255, 255, 0.3); */
+  /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
+}
+
+/* icons inside the controls */
+.maplibregl-ctrl-icon {
+  filter: brightness(0) invert(1); /* turn black icons to white */
+}
+
+/* buttons inside the control group */
+.maplibregl-ctrl-group button {
+  color: #000 !important; /* fallback if icons are font-based */
+  transition: background 0.2s ease;
+  border: none;
+  box-shadow: none;
+}
+
+/* remove white line between stacked buttons */
+.maplibregl-ctrl-group button + button {
+  border-top: none !important;
+  box-shadow: none !important;
+}
+
+/* hover effect for buttons */
+.maplibregl-ctrl-group button:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+}
