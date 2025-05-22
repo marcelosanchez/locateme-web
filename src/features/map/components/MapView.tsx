@@ -24,7 +24,7 @@ export function MapView() {
 
     const map = new maplibregl.Map({
       container: mapRef.current,
-      style: '/map-styles/findmy-dark.json',
+      style: import.meta.env.VITE_MAPTILER_URL, // '/map-styles/findmy-dark.json'
       center: DEFAULT_MAP_CENTER,
       zoom: DEFAULT_ZOOM,
       maxZoom: MAX_ZOOM,
