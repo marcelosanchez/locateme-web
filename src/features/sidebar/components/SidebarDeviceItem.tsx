@@ -1,4 +1,5 @@
 import { useMapStore } from '@/features/map/state/mapStore'
+import { useTrackingStore } from '@/features/map/state/trackingStore'
 import type { SidebarDeviceWithPosition } from '@/features/sidebar/model/sidebar.model'
 
 type Props = {
@@ -7,13 +8,17 @@ type Props = {
 
 export function SidebarDeviceItem({ device }: Props) {
   const centerMap = useMapStore(state => state.centerMap)
+  const setTrackedDeviceId = useTrackingStore(state => state.setTrackedDeviceId)
 
   return (
     <div
       className="flex items-center space-x-2 px-3 py-2 bg-white/5 hover:bg-white/10 rounded-lg cursor-pointer transition-colors"
       onClick={() => {
+        setTrackedDeviceId(device.id)
+
         const lat = parseFloat(device.latitude)
         const lng = parseFloat(device.longitude)
+
         if (!isNaN(lat) && !isNaN(lng)) {
           centerMap([lng, lat])
         } else {

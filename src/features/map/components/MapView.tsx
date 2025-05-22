@@ -11,12 +11,14 @@ import type { DevicePosition } from '@/types/deviceSnapshot'
 import { useLatestDevicePositions } from '@/features/devices/hooks/useLatestDevicePositions'
 import { DevicePopup } from '@/features/devices/components/DevicePopup'
 import { useMapStore } from '../state/mapStore'
+import { useTrackingStore } from '../state/trackingStore'
 
 export function MapView() {
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstance = useRef<maplibregl.Map | null>(null)
   const markersRef = useRef<Marker[]>([])
   const positions = useLatestDevicePositions()
+  const trackedDeviceId = useTrackingStore(state => state.trackedDeviceId)
 
   // init map
   useEffect(() => {
@@ -24,7 +26,7 @@ export function MapView() {
 
     const map = new maplibregl.Map({
       container: mapRef.current,
-      style: import.meta.env.VITE_MAPTILER_URL, // '/map-styles/findmy-dark.json'
+      style: import.meta.env.VITE_MAPTILER_URL,
       center: DEFAULT_MAP_CENTER,
       zoom: DEFAULT_ZOOM,
       maxZoom: MAX_ZOOM,
@@ -55,7 +57,7 @@ export function MapView() {
     }
   }, [])
 
-  // update markers
+  // update markers and track selected device
   useEffect(() => {
     if (!mapInstance.current || positions.length === 0) return
 
@@ -82,6 +84,13 @@ export function MapView() {
       el.style.userSelect = 'none'
       el.innerText = pos.device_icon || '📍'
 
+      // pulse effect for tracked device
+      if (pos.device_id === trackedDeviceId) {
+        const ring = document.createElement('div')
+        ring.className = 'pulse-ring'
+        el.appendChild(ring)
+      }
+
       const popupHtml = renderToString(<DevicePopup device={pos} />)
 
       const marker = new maplibregl.Marker({ element: el })
@@ -90,8 +99,13 @@ export function MapView() {
         .addTo(mapInstance.current!)
 
       markersRef.current.push(marker)
+
+      // auto-track selected device
+      if (trackedDeviceId && pos.device_id === trackedDeviceId) {
+        mapInstance.current!.flyTo({ center: [lng, lat], zoom: 17 })
+      }
     })
-  }, [positions])
+  }, [positions, trackedDeviceId])
 
   return <div ref={mapRef} className="fixed top-0 left-0 h-screen w-screen z-0" />
 }
