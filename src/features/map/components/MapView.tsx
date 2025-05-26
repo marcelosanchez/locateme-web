@@ -8,7 +8,7 @@ import '@/styles/map-markers.css'
 
 import { DEFAULT_MAP_CENTER, DEFAULT_ZOOM, MAX_ZOOM } from '@/config/constants'
 import type { DevicePosition } from '@/types/deviceSnapshot'
-import { useLatestDevicePositions } from '@/features/devices/hooks/useLatestDevicePositions'
+import { useOverviewPositions } from '@/features/devices/hooks/useOverviewPositions'
 import { DevicePopup } from '@/features/devices/components/DevicePopup'
 import { useMapStore } from '../state/mapStore'
 
@@ -24,7 +24,7 @@ export function MapView() {
   const routeLineIdsRef = useRef<string[]>([])
   const historyMarkersRef = useRef<Marker[]>([])
 
-  const positions = useLatestDevicePositions()
+  const positions = useOverviewPositions()
   const trackedDeviceId = useTrackingStore(state => state.trackedDeviceId)
   const history = useDeviceHistory(trackedDeviceId)
 

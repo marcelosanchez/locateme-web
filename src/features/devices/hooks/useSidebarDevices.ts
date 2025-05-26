@@ -10,34 +10,17 @@ export function useSidebarDevices(refreshMs = REFRESH_INTERVAL.normal): MergedDe
 
   const fetchDevices = async () => {
     try {
-      const [resDevices, resPositions] = await Promise.all([
-        fetch(`${import.meta.env.VITE_API_URL}/locateme/devices`, {
-          credentials: 'include',
-        }),
-        fetch(`${import.meta.env.VITE_API_URL}/locateme/position`)
-      ])
+      const url = new URL('/locateme/overview', import.meta.env.VITE_API_URL)
+      const res = await fetch(url.toString(), { credentials: 'include' })
 
-      if (!resDevices.ok || !resPositions.ok) {
-        throw new Error(`API response error: ${resDevices.status}, ${resPositions.status}`)
+      if (!res.ok) {
+        throw new Error(`API response error: ${res.status}`)
       }
 
-      const devicesData: DeviceBasic[] = await resDevices.json()
-      const positionsData: DevicePosition[] = await resPositions.json()
-
-      const merged: MergedDevice[] = devicesData.map(device => {
-        const position = positionsData.find(p => p.device_id === device.device_id)
-
-        return {
-          ...device,
-          latitude: position?.latitude ?? '',
-          longitude: position?.longitude ?? '',
-          readable_datetime: position?.readable_datetime,
-        }
-      })
-
-      setDevices(merged)
+      const data: MergedDevice[] = await res.json()
+      setDevices(data)
     } catch (error) {
-      console.error('[useSidebarDevices] Failed to fetch or merge data:', error)
+      console.error('[useSidebarDevices] Failed to fetch data:', error)
     }
   }
 
