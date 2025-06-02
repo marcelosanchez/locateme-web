@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
 export type User = {
   id: number
@@ -7,26 +8,27 @@ export type User = {
   name?: string
   picture?: string
   is_staff?: boolean
+  default_device_id?: string
 }
 
 type SessionState = {
   user: User | null
-  setUser: (user: User | null) => void
-  logout: () => Promise<void>
+  token: string | null
+  setSession: (user: User, token: string) => void
+  logout: () => void
 }
 
-export const useSessionStore = create<SessionState>((set) => ({
-  user: null,
-  setUser: (user) => set({ user }),
-  logout: async () => {
-    try {
-      await fetch(`${import.meta.env.VITE_API_URL}/logout`, {
-        method: 'GET',
-        credentials: 'include',
-      })
-    } catch (e) {
-      console.warn('[LOGOUT] Failed to call backend logout:', e)
+export const useSessionStore = create<SessionState>()(
+  persist(
+    (set) => ({
+      user: null,
+      token: null,
+      setSession: (user, token) => set({ user, token }),
+      logout: () => set({ user: null, token: null }),
+    }),
+    {
+      name: 'session-store',
+      partialize: (state) => ({ user: state.user, token: state.token }),
     }
-    set({ user: null })
-  },
-}))
+  )
+)

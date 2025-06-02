@@ -9,7 +9,7 @@ export function groupDevicesByPerson(devices: DevicePosition[]) {
 
       if (!acc[personId]) {
         acc[personId] = {
-          personName: d.person_name ?? 'Unknown',
+          personName: d.person_name ?? 'Sin asignar',
           personEmoji: d.person_emoji ?? '👤',
           devices: [],
         }

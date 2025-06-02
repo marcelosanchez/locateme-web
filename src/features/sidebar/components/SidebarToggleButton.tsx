@@ -1,5 +1,4 @@
 import { useSidebarState } from '../state/sidebarStore'
-import familyIcon from '@/ui/demo/icons/family_icon.png'
 
 export const SidebarToggleButton = () => {
   const { toggle } = useSidebarState()
@@ -9,11 +8,16 @@ export const SidebarToggleButton = () => {
       onClick={toggle}
       className="w-full bg-transparent rounded-full cursor-pointer flex items-center justify-center m-0 p-0"
     >
-      <img
-        src={familyIcon}
-        alt="Group Icon"
-        className="w-[35px] h-[35px] rounded-full ring-2 ring-white object-cover"
-      />
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="w-[28px] h-[28px] text-white"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
     </div>
   )
 }

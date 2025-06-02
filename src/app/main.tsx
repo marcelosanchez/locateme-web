@@ -24,3 +24,16 @@ createRoot(rootElement).render(
     </GoogleOAuthProvider>
   </React.StrictMode>
 )
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then(registration => {
+        console.log('[SW] Registered successfully with scope:', registration.scope)
+      })
+      .catch(error => {
+        console.error('[SW] Registration failed:', error)
+      })
+  })
+}

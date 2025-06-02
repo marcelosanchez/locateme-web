@@ -13,6 +13,7 @@
   color: white;
   user-select: none;
   backdrop-filter: blur(6px);
+  z-index: 1;
 }
 
 /* ---- Popup Container ---- */

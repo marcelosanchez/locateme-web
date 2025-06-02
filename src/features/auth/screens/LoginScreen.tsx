@@ -5,13 +5,13 @@ import { useSessionStore } from '@/shared/state/sessionStore'
 
 export function LoginScreen() {
   const navigate = useNavigate()
-  const setUser = useSessionStore(state => state.setUser)
+  const setSession = useSessionStore(state => state.setSession)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
   const handleSuccess = async (credentialResponse: CredentialResponse) => {
-    const token = credentialResponse.credential
-    if (!token) {
+    const googleToken = credentialResponse.credential
+    if (!googleToken) {
       setError('Token de autenticación no recibido.')
       return
     }
@@ -22,8 +22,7 @@ export function LoginScreen() {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/google/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ token }),
+        body: JSON.stringify({ token: googleToken }),
       })
 
       const data = await res.json()
@@ -33,8 +32,8 @@ export function LoginScreen() {
         return
       }
 
-      if (data?.email) {
-        setUser(data)
+      if (data?.token && data?.user?.email) {
+        setSession(data.user, data.token)
         navigate('/')
       } else {
         setError('Invalid response from server')

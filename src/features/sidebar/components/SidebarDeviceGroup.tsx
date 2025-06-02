@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { SidebarDeviceGroupProps } from '@/features/sidebar/model/sidebar.model'
 import { SidebarDeviceItem } from './SidebarDeviceItem'
+import styles from './Sidebar.module.css'
 
 export function SidebarDeviceGroup({ personName, personEmoji, devices }: SidebarDeviceGroupProps) {
   const [isOpen, setIsOpen] = useState(false)
@@ -9,13 +10,13 @@ export function SidebarDeviceGroup({ personName, personEmoji, devices }: Sidebar
     <div>
       <button
         onClick={() => setIsOpen(prev => !prev)}
-        className="w-full flex items-center justify-between text-white font-medium text-sm mb-2 px-2 py-1 rounded hover:bg-white/10 transition"
+        className={styles.groupHeader}
       >
-        <div className="flex items-center space-x-2">
-          <span className="text-lg">{personEmoji}</span>
+        <div className={styles.groupTitle}>
+          <span className="text-lg">{personEmoji} </span>
           <span>{personName}</span>
         </div>
-        <span className="text-xs">{isOpen ? '▾' : '▸'}</span>
+        <span className={styles.groupArrow}>{isOpen ? '▾' : '▸'}</span>
       </button>
 
       {isOpen && (

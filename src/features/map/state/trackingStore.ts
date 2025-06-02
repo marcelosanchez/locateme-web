@@ -1,11 +1,14 @@
 import { create } from 'zustand'
+import { useSessionStore } from '@/shared/state/sessionStore'
 
-interface TrackingState {
+interface TrackingStore {
   trackedDeviceId: string | null
-  setTrackedDeviceId: (deviceId: string | null) => void
+  setTrackedDeviceId: (id: string | null) => void
+  stopTracking: () => void
 }
 
-export const useTrackingStore = create<TrackingState>((set) => ({
-  trackedDeviceId: null,
-  setTrackedDeviceId: (deviceId) => set({ trackedDeviceId: deviceId }),
+export const useTrackingStore = create<TrackingStore>((set) => ({
+  trackedDeviceId: useSessionStore.getState().user?.default_device_id ?? null,
+  setTrackedDeviceId: (id) => set({ trackedDeviceId: id }),
+  stopTracking: () => set({ trackedDeviceId: null }),
 }))

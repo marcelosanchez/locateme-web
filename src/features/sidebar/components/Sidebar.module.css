@@ -1,0 +1,103 @@
+.wrapper {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 9999;
+  margin: 0;
+  padding: 5px;
+  border-radius: 20px;
+  max-height: calc(100vh - 20px);
+  transition: width 0.3s ease-in-out, height 0.3s ease-in-out;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  /* background-color: rgba(0, 0, 0, 0.5); */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  overflow: hidden;
+}
+
+.content {
+  padding: 10px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.deviceItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 15px;
+  /* background-color: rgba(255, 255, 255, 0.05); */
+  background-color: rgba(0, 0, 0, 0.1);
+  /* border-radius: 8px; */
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.deviceItem:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.deviceIcon {
+  font-size: 1.25rem;
+}
+
+.deviceName {
+  font-size: 0.875rem;
+  color: white;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.groupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: white;
+  border-radius: 20px;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background-color: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: background-color 0.2s ease-in-out;
+}
+
+.groupHeader:hover {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.groupTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.groupArrow {
+  font-size: 0.75rem;
+}
+
+.logoutButton {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 12px;
+  background-color: rgba(200, 200, 200, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.logoutButton:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
