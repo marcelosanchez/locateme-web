@@ -6,5 +6,5 @@ export class SessionExpiredError extends Error {
 }
 
 export const isSessionExpiredError = (error: unknown): error is SessionExpiredError => {
-  return error instanceof SessionExpiredError || (error as any)?.name === 'SessionExpiredError'
+  return error instanceof SessionExpiredError || (error as Error)?.name === 'SessionExpiredError'
 }

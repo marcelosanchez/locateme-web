@@ -10,7 +10,18 @@ export const SidebarDeviceList = () => {
   const error = useSidebarState(state => state.error)
 
   if (loading) {
-    return <div className="px-4 py-3 text-white text-sm">Cargando dispositivos...</div>
+    return (
+      <div className="px-4 py-3 flex items-center space-x-3">
+        <div 
+          className="inline-block animate-spin rounded-full border-2 border-solid border-white border-r-transparent w-4 h-4"
+          role="status"
+          aria-label="Cargando"
+        >
+          <span className="sr-only">Cargando...</span>
+        </div>
+        <span className="text-white text-sm">Cargando dispositivos...</span>
+      </div>
+    )
   }
 
   if (error) {
