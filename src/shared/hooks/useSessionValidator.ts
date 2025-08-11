@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useSessionStore } from '@/shared/state/sessionStore'
 
 export function useSessionValidator() {
   const token = useSessionStore(state => state.token)
   const setSession = useSessionStore(state => state.setSession)
   const logout = useSessionStore(state => state.logout)
+  const navigate = useNavigate()
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -26,8 +28,10 @@ export function useSessionValidator() {
           },
         })
 
-        if (res.status === 401) {
+        if (res.status === 401 || res.status === 403) {
+          // Token expirado o inválido - redirigir al login inmediatamente
           logout()
+          navigate('/login', { replace: true })
         } else if (res.ok) {
           const data = await res.json()
           if (data?.email) {
@@ -46,7 +50,7 @@ export function useSessionValidator() {
     }
 
     validate()
-  }, [token, setSession, logout])
+  }, [token, setSession, logout, navigate])
 
   return { loading, error }
 }

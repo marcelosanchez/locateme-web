@@ -3,21 +3,22 @@ import type { DevicePosition } from '@/types/deviceSnapshot'
 import { MAP_REFRESH_INTERVAL_MS } from '@/config/constants'
 import { useSessionStore } from '@/shared/state/sessionStore'
 import { useMapStore } from '@/features/map/state/mapStore'
+import { useAuthenticatedFetch } from '@/shared/hooks/useAuthenticatedFetch'
+import { isSessionExpiredError } from '@/shared/errors/SessionExpiredError'
 
 export function useOverviewPositions(refreshMs = MAP_REFRESH_INTERVAL_MS): DevicePosition[] {
   const [positions, setPositions] = useState<DevicePosition[]>([])
   const token = useSessionStore(state => state.token)
   const updateDevicePositions = useMapStore(state => state.updateDevicePositions)
+  const authenticatedFetch = useAuthenticatedFetch()
+  
   const fetchPositions = useCallback(async () => {
     if (!token) return
 
     try {
       const url = new URL('/locateme/map/positions', import.meta.env.VITE_API_URL)
-      const res = await fetch(url.toString(), {
+      const res = await authenticatedFetch(url.toString(), {
         method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       })
 
       if (!res.ok) throw new Error(`API error ${res.status}`)
@@ -38,9 +39,12 @@ export function useOverviewPositions(refreshMs = MAP_REFRESH_INTERVAL_MS): Devic
 
       updateDevicePositions(positionsById)
     } catch (err) {
-      console.error('[useOverviewPositions] Failed to fetch map positions:', err)
+      // if session expired, useAuthenticatedFetch already handled login redirect
+      if (!isSessionExpiredError(err)) {
+        console.error('[useOverviewPositions] Failed to fetch map positions:', err)
+      }
     }
-  }, [token, updateDevicePositions])
+  }, [token, updateDevicePositions, authenticatedFetch])
 
   useEffect(() => {
     fetchPositions()
