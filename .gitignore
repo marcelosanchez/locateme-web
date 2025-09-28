@@ -50,3 +50,7 @@ coverage/
 # Lockfiles (optional: uncomment depending on the package manager you use)
 # yarn.lock
 # pnpm-lock.yaml
+
+# Claude Code configurations
+.claude/
+CLAUDE.md
