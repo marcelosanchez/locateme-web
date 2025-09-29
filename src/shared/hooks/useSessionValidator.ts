@@ -13,7 +13,15 @@ export function useSessionValidator() {
   const didValidate = useRef(false)
 
   useEffect(() => {
-    if (!token || didValidate.current) {
+    // Si no hay token, redirigir inmediatamente al login
+    if (!token) {
+      logout()
+      navigate('/login', { replace: true })
+      setLoading(false)
+      return
+    }
+
+    if (didValidate.current) {
       setLoading(false)
       return
     }

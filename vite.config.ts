@@ -4,10 +4,15 @@ import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { VitePWA } from 'vite-plugin-pwa'
 
-const appVersion = process.env.VITE_APP_VERSION || '0.0.0'
+// Get version from package.json
+import packageJson from './package.json'
+const appVersion = process.env.VITE_APP_VERSION || packageJson.version
 
 // https://vite.dev/config/
 export default defineConfig({
+  define: {
+    'import.meta.env.VITE_APP_VERSION': JSON.stringify(appVersion)
+  },
   plugins: [
     react(),
     tailwindcss(),

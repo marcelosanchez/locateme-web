@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { usePWAUpdate } from '@/shared/hooks/usePWAUpdate'
 
+// Get version from package.json via Vite
+const APP_VERSION = import.meta.env.VITE_APP_VERSION || '1.1.0'
+
 export function PWAUpdateBanner() {
   const {
     updateAvailable,
@@ -17,9 +20,9 @@ export function PWAUpdateBanner() {
       <button
         onClick={() => setShowForceOptions(true)}
         className="fixed top-4 right-4 z-50 px-3 py-2 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-700 transition-colors"
-        title="Opciones de actualización PWA"
+        title={`LocateMe v${APP_VERSION} - Opciones de actualización PWA`}
       >
-        🔄 PWA
+        🔄 v{APP_VERSION}
       </button>
     )
   }
@@ -30,10 +33,10 @@ export function PWAUpdateBanner() {
         <div className="mb-3">
           <div className="flex items-center space-x-2 mb-2">
             <span className="text-green-600">✓</span>
-            <span className="text-sm font-medium">Nueva versión disponible</span>
+            <span className="text-sm font-medium">Nueva versión v{APP_VERSION}</span>
           </div>
           <p className="text-xs text-gray-600 mb-3">
-            Hay una actualización de la aplicación disponible.
+            Actualización disponible. Toca para aplicar la nueva versión.
           </p>
           <button
             onClick={updateServiceWorker}
@@ -80,7 +83,7 @@ export function PWAUpdateBanner() {
           </button>
           
           <p className="text-xs text-gray-500 mt-2">
-            <strong>Forzar Actualización:</strong> Elimina todo el cache, desregistra service workers y recarga la aplicación.
+            <strong>Forzar Actualización:</strong> Elimina todo el cache y fuerza v{APP_VERSION}. Útil si tienes problemas de cache.
           </p>
         </div>
       )}

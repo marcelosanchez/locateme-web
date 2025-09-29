@@ -5,17 +5,25 @@ import { MapView } from '@/features/map/components/MapView'
 import { Sidebar } from '@/features/sidebar/components/Sidebar'
 import { useSession } from '@/shared/hooks/useSession'
 import { useSessionValidator } from '@/shared/hooks/useSessionValidator'
+import { useGlobalAuthInterceptor } from '@/shared/hooks/useGlobalAuthInterceptor'
 import { TrackingStatus } from '@/features/map/components/TrackingStatus'
 import { OptimizedDataProvider } from '@/shared/providers/OptimizedDataProvider'
 import { PWAUpdateBanner } from '@/shared/components/PWAUpdateBanner'
 
 // layout component to protect routes
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  const { user } = useSession()
+  const { user, token } = useSession()
   const { loading } = useSessionValidator()
+  
+  // Enable global auth interceptor
+  useGlobalAuthInterceptor()
+
+  // Immediate redirect if no token or user
+  if (!token || !user) {
+    return <Navigate to="/login" replace />
+  }
 
   if (loading) return <div className="text-white p-4">Validando sesión...</div>
-  if (!user) return <Navigate to="/login" replace />
 
   return (
     <OptimizedDataProvider enabled={true}>

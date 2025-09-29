@@ -14,6 +14,17 @@
   user-select: none;
   backdrop-filter: blur(6px);
   z-index: 1;
+  position: relative;
+}
+
+/* ---- Tracked Marker (Always on Top) ---- */
+.custom-marker.tracked-marker {
+  z-index: 999 !important;
+  position: relative !important;
+  background-color: rgba(72, 72, 74, 0.8);
+  border: 3px solid #007AFF; /* Blue border for selected device */
+  box-shadow: 0 0 12px rgba(0, 122, 255, 0.6);
+  transform: scale(1.1); /* Slightly larger */
 }
 
 /* ---- Popup Container ---- */
