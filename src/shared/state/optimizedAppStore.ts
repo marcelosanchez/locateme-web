@@ -30,6 +30,14 @@ interface DeviceDetail extends DevicePosition {
   horizontal_accuracy?: number
   altitude?: number
   person_picture?: string | null
+  latest_position?: {
+    latitude: string
+    longitude: string
+    readable_datetime: string
+    timestamp?: number
+    battery_level?: number | null
+    battery_status?: string | null
+  }
 }
 
 interface DeviceRoute {

@@ -52,10 +52,11 @@ export function useMapOptimized(): UseMapOptimizedReturn {
     } else {
       // Request location if not available
       await userLocation.requestLocation()
-      if (userLocation.userLocation) {
+      const location: any = userLocation.userLocation
+      if (location) {
         const center: [number, number] = [
-          userLocation.userLocation.longitude,
-          userLocation.userLocation.latitude
+          location.longitude,
+          location.latitude
         ]
         setCenter(center)
         map?.flyTo({ center, zoom: 16 })
@@ -69,10 +70,11 @@ export function useMapOptimized(): UseMapOptimizedReturn {
     await selectedDevice.selectDevice(deviceId)
     
     // Then center on it
-    if (selectedDevice.selectedDevice?.latitude && selectedDevice.selectedDevice?.longitude) {
+    const device = selectedDevice.selectedDevice
+    if (device && device.latitude && device.longitude) {
       const center: [number, number] = [
-        parseFloat(selectedDevice.selectedDevice.longitude),
-        parseFloat(selectedDevice.selectedDevice.latitude)
+        parseFloat(device.longitude),
+        parseFloat(device.latitude)
       ]
       setCenter(center)
       map?.flyTo({ center, zoom: 17 })
@@ -88,10 +90,11 @@ export function useMapOptimized(): UseMapOptimizedReturn {
 
   // Auto-center on selected device when it changes
   useEffect(() => {
-    if (selectedDevice.selectedDevice?.latitude && selectedDevice.selectedDevice?.longitude && map) {
+    const device = selectedDevice.selectedDevice
+    if (device && device.latitude && device.longitude && map) {
       const center: [number, number] = [
-        parseFloat(selectedDevice.selectedDevice.longitude),
-        parseFloat(selectedDevice.selectedDevice.latitude)
+        parseFloat(device.longitude),
+        parseFloat(device.latitude)
       ]
       setCenter(center)
       map?.flyTo({ center, zoom: 17 })

@@ -86,13 +86,15 @@ export function usePerformanceMonitoring() {
   // Memory monitoring
   const updateMemoryMetrics = useCallback(() => {
     if ('memory' in performance) {
-      // @ts-ignore - Memory API is experimental
-      const memory = performance.memory
-      setMetrics(prev => ({
-        ...prev,
-        memoryUsage: memory.usedJSHeapSize,
-        memoryLimit: memory.jsHeapSizeLimit
-      }))
+      const perfWithMemory = performance as any
+      const memory = perfWithMemory.memory
+      if (memory && typeof memory === 'object') {
+        setMetrics(prev => ({
+          ...prev,
+          memoryUsage: memory.usedJSHeapSize || 0,
+          memoryLimit: memory.jsHeapSizeLimit || 0
+        }))
+      }
     }
   }, [])
 
@@ -162,7 +164,6 @@ export function usePerformanceMonitoring() {
   // Calculate refresh rates
   useEffect(() => {
     const calculateRefreshRates = () => {
-      const now = Date.now()
       const oneMinute = 60000
 
       // Calculate based on update frequencies

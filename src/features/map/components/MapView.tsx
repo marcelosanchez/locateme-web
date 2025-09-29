@@ -19,7 +19,7 @@ export function MapView() {
 
   // Use optimized data hooks
   const { positions } = useMapData()
-  const { device: selectedDevice, route: deviceRoute, deviceId: trackedDeviceId } = useSelectedDeviceData()
+  const { route: deviceRoute, deviceId: trackedDeviceId } = useSelectedDeviceData()
 
   const [mapReady, setMapReady] = useState(false)
 
@@ -29,8 +29,16 @@ export function MapView() {
   // smart tracking: fly to device position if it changes
   useSmartTracking(mapInstance.current, mapReady)
 
-  // render device markers and history (with optimized data)
-  useDeviceTrackingFlow(mapInstance.current, positions, deviceRoute, trackedDeviceId)
+  // render device markers and history (with optimized data) - filter out null coordinates
+  const validPositions = (positions || [])
+    .filter(p => p.latitude && p.longitude)
+    .map(p => ({
+      ...p,
+      latitude: p.latitude!,
+      longitude: p.longitude!,
+      readable_datetime: p.readable_datetime!
+    })) as any
+  useDeviceTrackingFlow(mapInstance.current, validPositions, (deviceRoute || []) as any, trackedDeviceId)
 
   // initialize map instance
   useEffect(() => {
@@ -40,7 +48,6 @@ export function MapView() {
     mapInstance.current = map
 
     useMapStore.setState({
-      map: map, // Store map instance for other hooks
       setCenter: ([lng, lat]) => {
         // console.log('[MapView.tsx] flyTo lng/lat:', lng, lat)
         map.flyTo({ center: [lng, lat], zoom: 17 })

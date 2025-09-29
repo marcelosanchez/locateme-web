@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useTrackingStore } from '../state/trackingStore'
 import { useMapStore } from '../state/mapStore'
-import { REFRESH_INTERVAL } from '@/config/constants'
+import { LEGACY_REFRESH_INTERVAL } from '@/config/constants'
 
 export function useAutoTracking(map: maplibregl.Map | null) {
   const trackedDeviceId = useTrackingStore(state => state.trackedDeviceId)
@@ -22,7 +22,7 @@ export function useAutoTracking(map: maplibregl.Map | null) {
           { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         )
       }
-    }, REFRESH_INTERVAL.tracking)
+    }, LEGACY_REFRESH_INTERVAL.tracking)
 
     return () => clearInterval(interval)
   }, [map, trackedDeviceId])

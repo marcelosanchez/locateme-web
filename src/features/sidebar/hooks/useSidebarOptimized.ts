@@ -52,10 +52,10 @@ export function useSidebarOptimized() {
           device_type: device.device_type,
           person_name: device.person_name,
           is_primary: device.is_primary,
-          // No position data for optimized sidebar
-          latitude: null,
-          longitude: null,
-          readable_datetime: null
+          // No position data for optimized sidebar - provide empty strings to match interface
+          latitude: '',
+          longitude: '',
+          readable_datetime: ''
         }))
         
         setDevices(transformedDevices)

@@ -12,11 +12,13 @@ export const SidebarDeviceList = () => {
     device_icon: device.device_icon,
     device_type: device.device_type,
     person_name: device.person_name,
+    person_id: 1, // Default person ID - will need to get from actual data
+    person_emoji: '👤', // Default emoji
     is_primary: device.is_primary,
-    // No position data needed for sidebar
-    latitude: null,
-    longitude: null,
-    readable_datetime: null
+    // No position data needed for sidebar, provide empty strings
+    latitude: '',
+    longitude: '',
+    readable_datetime: ''
   }))
   
   const grouped = groupDevicesByPerson(transformedDevices)

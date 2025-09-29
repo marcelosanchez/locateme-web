@@ -40,8 +40,9 @@ export function useInitialMapFocus(map: maplibregl.Map | null, mapReady: boolean
     // Otherwise request location with optimized hook
     requestLocation()
       .then(() => {
-        if (userLocation) {
-          const center = [userLocation.longitude, userLocation.latitude] as [number, number]
+        const location = userLocation as any
+        if (location) {
+          const center = [location.longitude, location.latitude] as [number, number]
           map.flyTo({ center, zoom: 16 })
           setCenter(center)
         }
@@ -56,16 +57,20 @@ export function useInitialMapFocus(map: maplibregl.Map | null, mapReady: boolean
   useEffect(() => {
     if (!mapReady || !hasFlownToBrowser || hasFlownToDefaultDevice || manualTracking) return
     if (defaultDeviceId) {
-      const position = getDevicePosition(defaultDeviceId)
-      if (position) {
-        const coords: [number, number] = [
-          parseFloat(position.longitude),
-          parseFloat(position.latitude)
-        ]
-        map?.flyTo({ center: coords, zoom: 17 })
-        setCenter(coords)
-        select(defaultDeviceId)
-        setHasFlownToDefaultDevice(true)
+      try {
+        const position = getDevicePosition(defaultDeviceId) as any
+        if (position && position.longitude && position.latitude) {
+          const coords: [number, number] = [
+            parseFloat(position.longitude as string),
+            parseFloat(position.latitude as string)
+          ]
+          map?.flyTo({ center: coords, zoom: 17 })
+          setCenter(coords)
+          select(defaultDeviceId)
+          setHasFlownToDefaultDevice(true)
+        }
+      } catch (error) {
+        console.warn('[useInitialMapFocus] Error getting device position:', error)
       }
     }
   }, [mapReady, hasFlownToBrowser, hasFlownToDefaultDevice, manualTracking, defaultDeviceId, getDevicePosition, map, setCenter, select])

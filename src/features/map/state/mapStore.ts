@@ -1,6 +1,10 @@
 import { create } from 'zustand'
+import maplibregl from 'maplibre-gl'
 
 interface MapStore {
+  map: maplibregl.Map | null
+  setMap: (map: maplibregl.Map | null) => void
+
   center: [number, number] | null
   setCenter: (coords: [number, number]) => void
   centerMap: (coords: [number, number]) => void
@@ -18,6 +22,9 @@ interface MapStore {
 }
 
 export const useMapStore = create<MapStore>((set, get) => ({
+  map: null,
+  setMap: (map) => set({ map }),
+
   center: null,
 
   setCenter: (coords) => {

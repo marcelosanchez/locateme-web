@@ -9,7 +9,6 @@ type Props = {
 
 export function SidebarDeviceItem({ device }: Props) {
   const centerMap = useMapStore(state => state.centerMap)
-  const map = useMapStore(state => state.map)
   const { select } = useSelectedDeviceData()
   const { getDevicePosition } = useOptimizedData()
 
@@ -26,7 +25,6 @@ export function SidebarDeviceItem({ device }: Props) {
         parseFloat(position.latitude)
       ]
       centerMap(coords)
-      map?.flyTo({ center: coords, zoom: 17 })
     } else {
       console.log(`[${device.name}]: Fetching fresh position...`)
       // The select() call above will fetch fresh position and center map automatically

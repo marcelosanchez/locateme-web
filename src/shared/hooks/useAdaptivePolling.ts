@@ -113,7 +113,7 @@ export function useAdaptivePolling(options: UseAdaptivePollingOptions = {}) {
   }, [enabled])
 
   // Smart refresh based on staleness
-  const smartRefresh = useCallback(() => {
+  const smartRefresh = useCallback(async (): Promise<void> => {
     const now = Date.now()
     const staleThreshold = 60000 // 1 minute
 
@@ -121,7 +121,7 @@ export function useAdaptivePolling(options: UseAdaptivePollingOptions = {}) {
     const mapStale = !lastUpdates.map || (now - lastUpdates.map.getTime()) > staleThreshold
     const selectedDeviceStale = lastUpdates.selectedDevice && (now - lastUpdates.selectedDevice.getTime()) > staleThreshold
 
-    const refreshPromises = []
+    const refreshPromises: Promise<void>[] = []
 
     if (sidebarStale) {
       refreshPromises.push(refreshSidebarData())
@@ -135,7 +135,7 @@ export function useAdaptivePolling(options: UseAdaptivePollingOptions = {}) {
       refreshPromises.push(refreshSelectedDevice())
     }
 
-    return Promise.all(refreshPromises)
+    await Promise.all(refreshPromises)
   }, [lastUpdates, refreshSidebarData, refreshMapData, refreshSelectedDevice])
 
   // Connection quality detection
