@@ -1,52 +1,72 @@
 import { useEffect, useState } from 'react'
-import { useTrackingStore } from '../state/trackingStore'
+import { useSelectedDeviceData, useOptimizedData } from '@/shared/providers/OptimizedDataProvider'
 import { useMapStore } from '../state/mapStore'
 import { useSessionStore } from '@/shared/state/sessionStore'
+import { useUserLocationOptimized } from './useUserLocationOptimized'
 
 export function useInitialMapFocus(map: maplibregl.Map | null, mapReady: boolean) {
   const defaultDeviceId = useSessionStore(state => state.user?.default_device_id)
-  const setTrackedDeviceId = useTrackingStore(state => state.setTrackedDeviceId)
-  const getDevicePosition = useMapStore(state => state.getDevicePosition)
+  const { select } = useSelectedDeviceData()
+  const { getDevicePosition } = useOptimizedData()
   const setCenter = useMapStore(state => state.setCenter)
+
+  // Use optimized user location hook
+  const { userLocation, requestLocation } = useUserLocationOptimized()
 
   const [hasFlownToBrowser, setHasFlownToBrowser] = useState(false)
   const [hasFlownToDefaultDevice, setHasFlownToDefaultDevice] = useState(false)
   const [manualTracking, setManualTracking] = useState(false)
+  const { deviceId: currentlySelectedDeviceId } = useSelectedDeviceData()
 
   useEffect(() => {
-    const unsub = useTrackingStore.subscribe((state) => {
-      if (state.trackedDeviceId && state.trackedDeviceId !== defaultDeviceId) {
-        setManualTracking(true)
-      }
-    })
-    return () => unsub()
-  }, [defaultDeviceId])
+    if (currentlySelectedDeviceId && currentlySelectedDeviceId !== defaultDeviceId) {
+      setManualTracking(true)
+    }
+  }, [currentlySelectedDeviceId, defaultDeviceId])
 
+  // Optimized geolocation effect
   useEffect(() => {
     if (!map || hasFlownToBrowser) return
-    navigator.geolocation.getCurrentPosition(
-      ({ coords }) => {
-        const center = [coords.longitude, coords.latitude] as [number, number]
-        // console.log('[useInitialMapFocus] flyTo coords:', center)
-        map.flyTo({ center, zoom: 16 })
-        setCenter(center)
+    
+    // If we already have user location, use it immediately
+    if (userLocation) {
+      const center = [userLocation.longitude, userLocation.latitude] as [number, number]
+      map.flyTo({ center, zoom: 16 })
+      setCenter(center)
+      setHasFlownToBrowser(true)
+      return
+    }
+
+    // Otherwise request location with optimized hook
+    requestLocation()
+      .then(() => {
+        if (userLocation) {
+          const center = [userLocation.longitude, userLocation.latitude] as [number, number]
+          map.flyTo({ center, zoom: 16 })
+          setCenter(center)
+        }
         setHasFlownToBrowser(true)
-      },
-      () => setHasFlownToBrowser(true),
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-    )
-  }, [map, hasFlownToBrowser, setCenter])
+      })
+      .catch(() => {
+        // Fallback: set as flown anyway to continue with default device
+        setHasFlownToBrowser(true)
+      })
+  }, [map, hasFlownToBrowser, userLocation, requestLocation, setCenter])
 
   useEffect(() => {
     if (!mapReady || !hasFlownToBrowser || hasFlownToDefaultDevice || manualTracking) return
     if (defaultDeviceId) {
-      const coords = getDevicePosition(defaultDeviceId)
-      if (coords) {
+      const position = getDevicePosition(defaultDeviceId)
+      if (position) {
+        const coords: [number, number] = [
+          parseFloat(position.longitude),
+          parseFloat(position.latitude)
+        ]
         map?.flyTo({ center: coords, zoom: 17 })
         setCenter(coords)
-        setTrackedDeviceId(defaultDeviceId)
+        select(defaultDeviceId)
         setHasFlownToDefaultDevice(true)
       }
     }
-  }, [mapReady, hasFlownToBrowser, hasFlownToDefaultDevice, manualTracking, defaultDeviceId])
+  }, [mapReady, hasFlownToBrowser, hasFlownToDefaultDevice, manualTracking, defaultDeviceId, getDevicePosition, map, setCenter, select])
 }

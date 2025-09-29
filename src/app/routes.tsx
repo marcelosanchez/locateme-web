@@ -6,6 +6,8 @@ import { Sidebar } from '@/features/sidebar/components/Sidebar'
 import { useSession } from '@/shared/hooks/useSession'
 import { useSessionValidator } from '@/shared/hooks/useSessionValidator'
 import { TrackingStatus } from '@/features/map/components/TrackingStatus'
+import { OptimizedDataProvider } from '@/shared/providers/OptimizedDataProvider'
+import { PWAUpdateBanner } from '@/shared/components/PWAUpdateBanner'
 
 // layout component to protect routes
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
@@ -16,10 +18,13 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
   if (!user) return <Navigate to="/login" replace />
 
   return (
-    <div className="h-screen w-screen">
-      <Sidebar />
-      <div className="h-screen w-screen relative">{children}</div>
-    </div>
+    <OptimizedDataProvider enabled={true}>
+      <div className="h-screen w-screen">
+        <Sidebar />
+        <div className="h-screen w-screen relative">{children}</div>
+        <PWAUpdateBanner />
+      </div>
+    </OptimizedDataProvider>
   )
 }
 

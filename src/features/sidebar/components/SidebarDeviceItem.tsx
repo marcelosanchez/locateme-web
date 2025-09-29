@@ -1,6 +1,6 @@
 import styles from './Sidebar.module.css'
 import { useMapStore } from '@/features/map/state/mapStore'
-import { useTrackingStore } from '@/features/map/state/trackingStore'
+import { useSelectedDeviceData, useOptimizedData } from '@/shared/providers/OptimizedDataProvider'
 import type { SidebarDeviceWithPosition } from '@/features/sidebar/model/sidebar.model'
 
 type Props = {
@@ -9,21 +9,34 @@ type Props = {
 
 export function SidebarDeviceItem({ device }: Props) {
   const centerMap = useMapStore(state => state.centerMap)
-  const devicePositions = useMapStore(state => state.devicePositions)
-  const setTrackedDeviceId = useTrackingStore(state => state.setTrackedDeviceId)
+  const map = useMapStore(state => state.map)
+  const { select } = useSelectedDeviceData()
+  const { getDevicePosition } = useOptimizedData()
+
+  const handleDeviceClick = async () => {
+    // Select device for real-time tracking (15s updates)
+    await select(device.id)
+    
+    // Try to get position from optimized store first
+    const position = getDevicePosition(device.id)
+    
+    if (position?.latitude && position?.longitude) {
+      const coords: [number, number] = [
+        parseFloat(position.longitude),
+        parseFloat(position.latitude)
+      ]
+      centerMap(coords)
+      map?.flyTo({ center: coords, zoom: 17 })
+    } else {
+      console.log(`[${device.name}]: Fetching fresh position...`)
+      // The select() call above will fetch fresh position and center map automatically
+    }
+  }
 
   return (
     <div
       className={styles.deviceItem}
-      onClick={() => {
-        setTrackedDeviceId(device.id)
-        const coords = devicePositions[device.id]
-        if (coords) {
-          centerMap(coords)
-        } else {
-          console.log(`[${device.name}]: No position found in store`)
-        }
-      }}
+      onClick={handleDeviceClick}
     >
       <span className={styles.deviceIcon}>{device.icon || '📍'}</span>
       <span className={styles.deviceName}>{device.name || device.id}</span>

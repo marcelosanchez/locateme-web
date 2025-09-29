@@ -5,26 +5,21 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import '@/styles/map-controls.css'
 import '@/styles/map-markers.css'
 
-import { useOverviewPositions } from '@/features/devices/hooks/useOverviewPositions'
-import { useDeviceHistory } from '@/features/devices/hooks/useDeviceHistory'
-
-import { useTrackingStore } from '@/features/map/state/trackingStore'
+import { useMapData, useSelectedDeviceData } from '@/shared/providers/OptimizedDataProvider'
 import { useMapStore } from '@/features/map/state/mapStore'
 
 import { initMap } from '@/features/map/lib/initMap'
 import { useInitialMapFocus } from '@/features/map/hooks/useInitialMapFocus'
 import { useSmartTracking } from '../hooks/useSmartTracking'
 import { useDeviceTrackingFlow } from '../hooks/useDeviceTrackingFlow'
-import { useSidebarDevices } from '@/features/devices/hooks/useSidebarDevices'
 
 export function MapView() {
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstance = useRef<maplibregl.Map | null>(null)
 
-  const positions = useOverviewPositions()
-  useSidebarDevices() // preload devices into sidebar
-  const trackedDeviceId = useTrackingStore(state => state.trackedDeviceId)
-  const history = useDeviceHistory(trackedDeviceId)
+  // Use optimized data hooks
+  const { positions } = useMapData()
+  const { device: selectedDevice, route: deviceRoute, deviceId: trackedDeviceId } = useSelectedDeviceData()
 
   const [mapReady, setMapReady] = useState(false)
 
@@ -34,8 +29,8 @@ export function MapView() {
   // smart tracking: fly to device position if it changes
   useSmartTracking(mapInstance.current, mapReady)
 
-  // render device markers and history
-  useDeviceTrackingFlow(mapInstance.current, positions, history, trackedDeviceId)
+  // render device markers and history (with optimized data)
+  useDeviceTrackingFlow(mapInstance.current, positions, deviceRoute, trackedDeviceId)
 
   // initialize map instance
   useEffect(() => {
@@ -45,6 +40,7 @@ export function MapView() {
     mapInstance.current = map
 
     useMapStore.setState({
+      map: map, // Store map instance for other hooks
       setCenter: ([lng, lat]) => {
         // console.log('[MapView.tsx] flyTo lng/lat:', lng, lat)
         map.flyTo({ center: [lng, lat], zoom: 17 })
