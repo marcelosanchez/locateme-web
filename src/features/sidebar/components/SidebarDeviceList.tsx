@@ -1,27 +1,13 @@
-import { useSidebarData } from '@/shared/providers/OptimizedDataProvider'
+import { useSidebarDevices } from '@/features/devices/hooks/useSidebarDevices'
 import { groupDevicesByPerson } from '@/features/devices/lib/deviceUtils'
 import { SidebarDeviceGroup } from './SidebarDeviceGroup'
 
 export const SidebarDeviceList = () => {
-  const { devices, loading, error } = useSidebarData()
+  const devices = useSidebarDevices()
+  const loading = false // useSidebarDevices manages its own loading state
+  const error = null // useSidebarDevices manages its own error state
   
-  // Transform optimized data to match existing interface
-  const transformedDevices = devices.map(device => ({
-    device_id: device.device_id,
-    device_name: device.device_name,
-    device_icon: device.device_icon,
-    device_type: device.device_type,
-    person_name: device.person_name,
-    person_id: 1, // Default person ID - will need to get from actual data
-    person_emoji: '👤', // Default emoji
-    is_primary: device.is_primary,
-    // No position data needed for sidebar, provide empty strings
-    latitude: '',
-    longitude: '',
-    readable_datetime: ''
-  }))
-  
-  const grouped = groupDevicesByPerson(transformedDevices)
+  const grouped = groupDevicesByPerson(devices)
 
   if (loading) {
     return (

@@ -15,13 +15,9 @@ export function useAutoTracking(map: maplibregl.Map | null) {
       if (trackedDeviceId) {
         const coords = getDevicePosition(trackedDeviceId)
         if (coords) setCenter(coords)
-      } else {
-        navigator.geolocation.getCurrentPosition(
-          ({ coords }) => setCenter([coords.longitude, coords.latitude]),
-          (err) => console.warn('[Tracking] Geo fallback error:', err),
-          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-        )
       }
+      // Removed automatic geolocation fallback to prevent CoreLocationProvider errors
+      // Users can manually enable location if needed
     }, LEGACY_REFRESH_INTERVAL.tracking)
 
     return () => clearInterval(interval)

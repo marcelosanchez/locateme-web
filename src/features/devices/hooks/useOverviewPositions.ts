@@ -16,7 +16,7 @@ export function useOverviewPositions(refreshMs = MAP_REFRESH_INTERVAL_MS): Devic
     if (!token) return
 
     try {
-      const url = new URL('/locateme/map/positions', import.meta.env.VITE_API_URL)
+      const url = new URL(`${import.meta.env.VITE_API_URL}/locateme/map/positions`)
       const res = await authenticatedFetch(url.toString(), {
         method: 'GET',
       })
@@ -32,6 +32,7 @@ export function useOverviewPositions(refreshMs = MAP_REFRESH_INTERVAL_MS): Devic
           const lat = parseFloat(pos.latitude as unknown as string)
           const lng = parseFloat(pos.longitude as unknown as string)
           if (!isNaN(lat) && !isNaN(lng)) {
+            // Store as [lat, lng] for mapStore conversion to [lng, lat]
             positionsById[pos.device_id] = [lat, lng]
           }
         }

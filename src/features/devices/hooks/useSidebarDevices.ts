@@ -25,7 +25,7 @@ export function useSidebarDevices(): MergedDevice[] {
       setError(null)
 
       try {
-        const url = new URL('/locateme/sidebar/devices', import.meta.env.VITE_API_URL)
+        const url = new URL(`${import.meta.env.VITE_API_URL}/locateme/sidebar/devices`)
         const res = await authenticatedFetch(url.toString(), {
           method: 'GET',
         })

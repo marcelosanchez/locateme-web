@@ -140,14 +140,15 @@ export function useUserLocationOptimized(): UseUserLocationOptimizedReturn {
     })
   }, [isSupported])
 
-  // Auto-request location if permission is granted and no location stored
-  useEffect(() => {
-    if (hasPermission === true && !userLocation && !isLoading) {
-      requestLocation().catch(() => {
-        // Ignore errors from auto-request
-      })
-    }
-  }, [hasPermission, userLocation, isLoading, requestLocation])
+  // Disabled auto-request to prevent CoreLocationProvider errors
+  // Users can manually request location when needed
+  // useEffect(() => {
+  //   if (hasPermission === true && !userLocation && !isLoading) {
+  //     requestLocation().catch(() => {
+  //       // Ignore errors from auto-request
+  //     })
+  //   }
+  // }, [hasPermission, userLocation, isLoading, requestLocation])
 
   return {
     userLocation,

@@ -8,11 +8,11 @@ export const API_BASE_URL = 'https://api.synclab.dev/locateme'
 
 // Optimized API endpoints
 export const OPTIMIZED_API_ENDPOINTS = {
-  sidebarDeviceNames: '/optimized/sidebar/device-names',
-  mapDevicePositions: '/optimized/map/device-positions', 
-  singleDevicePosition: '/optimized/devices/:deviceId/position',
-  batchPositions: '/optimized/map/batch-positions',
-  deviceRoute: '/optimized/devices/:deviceId/route'
+  sidebarDeviceNames: '/locateme/optimized/sidebar/device-names',
+  mapDevicePositions: '/locateme/optimized/map/device-positions', 
+  singleDevicePosition: '/locateme/optimized/devices/:deviceId/position',
+  batchPositions: '/locateme/optimized/map/batch-positions',
+  deviceRoute: '/locateme/optimized/devices/:deviceId/route'
 }
 
 export const REFRESH_INTERVAL = {

@@ -26,7 +26,7 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
   if (loading) return <div className="text-white p-4">Validando sesión...</div>
 
   return (
-    <OptimizedDataProvider enabled={true}>
+    <OptimizedDataProvider enabled={false}>
       <div className="h-screen w-screen">
         <Sidebar />
         <div className="h-screen w-screen relative">{children}</div>

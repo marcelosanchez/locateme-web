@@ -1,6 +1,6 @@
 import styles from './Sidebar.module.css'
 import { useMapStore } from '@/features/map/state/mapStore'
-import { useSelectedDeviceData, useOptimizedData } from '@/shared/providers/OptimizedDataProvider'
+import { useTrackingStore } from '@/features/map/state/trackingStore'
 import type { SidebarDeviceWithPosition } from '@/features/sidebar/model/sidebar.model'
 
 type Props = {
@@ -9,25 +9,21 @@ type Props = {
 
 export function SidebarDeviceItem({ device }: Props) {
   const centerMap = useMapStore(state => state.centerMap)
-  const { select } = useSelectedDeviceData()
-  const { getDevicePosition } = useOptimizedData()
+  const getDevicePosition = useMapStore(state => state.getDevicePosition)
+  const setTrackedDeviceId = useTrackingStore(state => state.setTrackedDeviceId)
 
-  const handleDeviceClick = async () => {
-    // Select device for real-time tracking (15s updates)
-    await select(device.id)
+  const handleDeviceClick = () => {
+    // Select device for tracking
+    setTrackedDeviceId(device.id)
     
-    // Try to get position from optimized store first
-    const position = getDevicePosition(device.id)
+    // Try to get position from map store
+    const coords = getDevicePosition(device.id)
     
-    if (position?.latitude && position?.longitude) {
-      const coords: [number, number] = [
-        parseFloat(position.longitude),
-        parseFloat(position.latitude)
-      ]
+    if (coords) {
       centerMap(coords)
+      console.log(`[${device.name}]: Centered map on device position`)
     } else {
-      console.log(`[${device.name}]: Fetching fresh position...`)
-      // The select() call above will fetch fresh position and center map automatically
+      console.log(`[${device.name}]: Position not available yet`)
     }
   }
 

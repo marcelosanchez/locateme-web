@@ -5,6 +5,7 @@ import { renderDeviceMarkers } from '../lib/renderDeviceMarkers'
 import { renderHistory } from '../lib/renderHistory'
 import { useMapStore } from '@/features/map/state/mapStore'
 
+
 export function useDeviceTrackingFlow(
   map: maplibregl.Map | null,
   positions: DevicePosition[],
