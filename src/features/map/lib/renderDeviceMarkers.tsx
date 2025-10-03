@@ -45,11 +45,11 @@ export function renderDeviceMarkers(
 
     const popupHtml = renderToString(<DevicePopup device={pos} />)
 
-    // Create popup first to see how it positions itself
+    // Create popup first 
     const popup = new Popup({ offset: 25, closeButton: false }).setHTML(popupHtml)
     
-    // Use exact same positioning as popup - remove marker element and use default pin
-    const marker = new maplibregl.Marker()
+    // Use default marker with custom color - this positioning works perfectly
+    const marker = new maplibregl.Marker({ color: '#636365' })
       .setLngLat([lng, lat])
       .setPopup(popup)
       .addTo(map)
@@ -66,32 +66,12 @@ export function renderDeviceMarkers(
       const lng = parseFloat(trackedPos.longitude)
       
       if (!isNaN(lat) && !isNaN(lng)) {
+        console.log(`[TRACKED] ${trackedPos.device_id}: lat=${lat}, lng=${lng}, setting at [${lng}, ${lat}]`)
         
-        const el = document.createElement('div')
-        el.className = 'custom-marker tracked-marker'
-        el.style.width = '42px'
-        el.style.height = '42px'
-        el.style.borderRadius = '50%'
-        el.style.backgroundColor = '#48484a'
-        el.style.border = '2px solid #636365'
-        el.style.display = 'flex'
-        el.style.justifyContent = 'center'
-        el.style.alignItems = 'center'
-        el.style.fontSize = '22px'
-        el.style.color = 'white'
-        el.style.userSelect = 'none'
-        el.style.zIndex = '999' // Tracked marker always on top
-        el.style.position = 'relative'
-        el.innerText = trackedPos.device_icon || '📍'
-
-        // Add pulse ring for tracked device
-        const ring = document.createElement('div')
-        ring.className = 'pulse-ring'
-        el.appendChild(ring)
-
         const popupHtml = renderToString(<DevicePopup device={trackedPos} />)
 
-        trackedMarker = new maplibregl.Marker({ element: el, anchor: 'center' })
+        // Use default marker with blue color for tracked device - positioning works perfectly  
+        trackedMarker = new maplibregl.Marker({ color: '#007AFF' })
           .setLngLat([lng, lat])
           .setPopup(new Popup({ offset: 25, closeButton: false }).setHTML(popupHtml))
           .addTo(map)
