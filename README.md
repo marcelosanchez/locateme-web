@@ -1,6 +1,59 @@
-# React + TypeScript + Vite
+# LocateMe Web - Real-Time Device Tracking PWA
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React 19-based Progressive Web Application for real-time device tracking and location monitoring with Google OAuth authentication and interactive map interfaces.
+
+## 🚀 Quick Start
+
+```bash
+npm install
+npm run dev
+```
+
+## 🗺️ Map Configuration
+
+The application uses MapLibre GL for interactive mapping. By default, it uses a free OpenStreetMap-based theme.
+
+### Setting up MapTiler (Premium Maps)
+
+For enhanced map features and styles, you can use MapTiler's premium maps:
+
+#### 1. Get a Free MapTiler API Key
+
+1. Visit [MapTiler Cloud](https://cloud.maptiler.com/)
+2. **Sign up for free** (no credit card required)
+3. Once logged in, go to **API Keys** section
+4. Copy your **Default Key** (starts with `pk.eyJ...`)
+
+#### 2. Configure Map Style
+
+1. Copy the template file:
+   ```bash
+   cp public/map-styles/findmy-dark.json.template public/map-styles/findmy-dark.json
+   ```
+
+2. Edit `public/map-styles/findmy-dark.json` and replace all instances of:
+   ```
+   get_your_own_OpIi9ZULNHzrESv6T2vL
+   ```
+   with your actual MapTiler API key.
+
+3. Update your `.env` file:
+   ```bash
+   VITE_MAPTILER_URL=/map-styles/findmy-dark.json
+   ```
+
+#### 3. Fallback Configuration
+
+If you don't set up MapTiler, the application will automatically use the free OSM dark theme:
+```bash
+VITE_MAPTILER_URL=/map-styles/osm-dark.json
+```
+
+### Map Themes Available
+- `osm-dark.json` - Free OpenStreetMap dark theme ✅
+- `findmy-dark.json` - Premium FindMy-style theme (requires MapTiler key) 🔑
+
+## 🔧 Development
 
 Currently, two official plugins are available:
 

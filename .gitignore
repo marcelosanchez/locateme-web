@@ -36,6 +36,9 @@ coverage/
 .env
 .env.*.local
 
+# Map styles with API keys
+public/map-styles/findmy-dark.json
+
 # Editor directories and files
 .DS_Store
 .vscode/*

@@ -9,12 +9,12 @@
   "pitch": 0,
   "sources": {
     "openmaptiles": {
-      "url": "https://api.maptiler.com/tiles/v3-openmaptiles/tiles.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL",
+      "url": "https://api.maptiler.com/tiles/v3-openmaptiles/tiles.json?key=get_your_own_in_maptiler_dashboard",
       "type": "vector"
     }
   },
   "sprite": "https://api.maptiler.com/maps/openstreetmap/sprite",
-  "glyphs": "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=get_your_own_OpIi9ZULNHzrESv6T2vL",
+  "glyphs": "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=get_your_own_in_maptiler_dashboard",
   "layers": [
     {
       "id": "Background",
