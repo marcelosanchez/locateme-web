@@ -23,8 +23,6 @@ export function renderDeviceMarkers(
     const lng = parseFloat(pos.longitude)
     if (isNaN(lat) || isNaN(lng)) return
     
-    console.log(`[MARKER] ${pos.device_id}: lat=${lat}, lng=${lng}, setting at [${lng}, ${lat}]`)
-    
     // Create device marker with proper icon
     const el = document.createElement('div')
     el.className = 'custom-marker'
@@ -48,8 +46,25 @@ export function renderDeviceMarkers(
     // Create popup first 
     const popup = new Popup({ offset: 25, closeButton: false }).setHTML(popupHtml)
     
-    // Use default marker with custom color - this positioning works perfectly
-    const marker = new maplibregl.Marker({ color: '#636365' })
+    // Create minimal custom element with device icon but keep default positioning
+    const markerEl = document.createElement('div')
+    markerEl.style.width = '42px'
+    markerEl.style.height = '42px'
+    markerEl.style.borderRadius = '50%'
+    markerEl.style.backgroundColor = 'rgba(72, 72, 74, 0.4)'
+    markerEl.style.display = 'flex'
+    markerEl.style.alignItems = 'center'
+    markerEl.style.justifyContent = 'center'
+    markerEl.style.fontSize = '22px'
+    markerEl.style.color = 'white'
+    markerEl.style.border = '2px solid #636365'
+    markerEl.style.backdropFilter = 'blur(6px)'
+    markerEl.style.boxShadow = '0 0 6px rgba(0, 0, 0, 0.2)'
+    markerEl.style.userSelect = 'none'
+    markerEl.innerText = pos.device_icon || '📍'
+    
+    // Use custom element but NO ANCHOR specified = default positioning behavior
+    const marker = new maplibregl.Marker({ element: markerEl })
       .setLngLat([lng, lat])
       .setPopup(popup)
       .addTo(map)
@@ -66,12 +81,32 @@ export function renderDeviceMarkers(
       const lng = parseFloat(trackedPos.longitude)
       
       if (!isNaN(lat) && !isNaN(lng)) {
-        console.log(`[TRACKED] ${trackedPos.device_id}: lat=${lat}, lng=${lng}, setting at [${lng}, ${lat}]`)
-        
         const popupHtml = renderToString(<DevicePopup device={trackedPos} />)
 
-        // Use default marker with blue color for tracked device - positioning works perfectly  
-        trackedMarker = new maplibregl.Marker({ color: '#007AFF' })
+        // Create minimal custom element for tracked device with blue styling
+        const trackedEl = document.createElement('div')
+        trackedEl.style.width = '42px'
+        trackedEl.style.height = '42px'
+        trackedEl.style.borderRadius = '50%'
+        trackedEl.style.backgroundColor = 'rgba(72, 72, 74, 0.8)'
+        trackedEl.style.display = 'flex'
+        trackedEl.style.alignItems = 'center'
+        trackedEl.style.justifyContent = 'center'
+        trackedEl.style.fontSize = '22px'
+        trackedEl.style.color = 'white'
+        trackedEl.style.border = '1px solid rgba(0, 122, 255, 0.5)'
+        trackedEl.style.boxShadow = '0 0 12px rgba(0, 122, 255, 0.2)'
+        trackedEl.style.transform = 'scale(1.1)'
+        trackedEl.style.position = 'relative'
+        trackedEl.innerText = trackedPos.device_icon || '📍'
+        
+        // Add minimal pulse ring effect
+        const ring = document.createElement('div')
+        ring.className = 'pulse-ring'
+        trackedEl.appendChild(ring)
+        
+        // Use custom element but NO ANCHOR specified = default positioning behavior
+        trackedMarker = new maplibregl.Marker({ element: trackedEl })
           .setLngLat([lng, lat])
           .setPopup(new Popup({ offset: 25, closeButton: false }).setHTML(popupHtml))
           .addTo(map)
