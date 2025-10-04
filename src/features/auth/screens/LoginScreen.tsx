@@ -5,8 +5,8 @@ import { useSessionStore } from '@/shared/state/sessionStore'
 import { PulseVisual } from '@/ui/elements/PulseVisual'
 import { GoogleLoginButton } from '@/features/auth/components/GoogleLoginButton'
 
-// Import background image
-const backgroundImage = '/images/login/background.png'
+// Import background image with app version for cache busting
+const backgroundImage = `/images/login/background.png?v=${import.meta.env.VITE_APP_VERSION || '1.1.1'}`
 
 // Helper to get the correct API URL for auth endpoints
 const getAuthApiUrl = () => {

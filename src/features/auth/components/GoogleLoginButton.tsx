@@ -26,16 +26,25 @@ export function GoogleLoginButton({ onSuccess, onError, disabled = false }: Prop
         userSelect: disabled ? 'none' : 'auto'
       }}
     >
-      <GoogleLogin
-        onSuccess={onSuccess}
-        onError={onError}
-        theme="outline"
-        size="large"
-        text="signin_with"
-        shape="rectangular"
-        logo_alignment="left"
-        width="100%"
-      />
+      <div style={{
+        backgroundColor: 'white',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        border: '1px solid white',
+        borderRadius: '12px',
+        padding: '2px'
+      }}>
+        <GoogleLogin
+          onSuccess={onSuccess}
+          onError={onError}
+          theme="outline"
+          size="large"
+          text="signin_with"
+          shape="rectangular"
+          logo_alignment="left"
+          width="100%"
+        />
+      </div>
     </RippleEffect>
   )
 }
