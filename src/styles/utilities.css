@@ -19,3 +19,10 @@
 .rounded-vp {
   border-radius: 20px;
 }
+
+/* Login Screen - Override global #root styles */
+#root:has(.login-screen) {
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
