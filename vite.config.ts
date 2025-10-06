@@ -19,6 +19,11 @@ export default defineConfig({
     tsconfigPaths(),
     VitePWA({
       registerType: 'autoUpdate',
+      workbox: {
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true
+      },
       includeAssets: ['favicon.svg', 'icons/apple-touch-icon2.png'],
       manifest: {
         name: 'Locateme',
