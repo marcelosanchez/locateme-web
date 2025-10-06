@@ -7,6 +7,7 @@ type SidebarDevice = DeviceBasic & Pick<DevicePosition, 'latitude' | 'longitude'
 type SidebarState = {
   collapsed: boolean
   toggle: () => void
+  collapse: () => void
 
   devices: SidebarDevice[]
   setDevices: (devices: SidebarDevice[]) => void
@@ -21,6 +22,7 @@ type SidebarState = {
 export const useSidebarState = create<SidebarState>((set) => ({
   collapsed: true,
   toggle: () => set((state) => ({ collapsed: !state.collapsed })),
+  collapse: () => set({ collapsed: true }),
 
   devices: [],
   setDevices: (devices) => set({ devices }),

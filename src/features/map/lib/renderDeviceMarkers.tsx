@@ -8,6 +8,16 @@ export function renderDeviceMarkers(
   positions: DevicePosition[],
   trackedDeviceId: string | null
 ): Marker[] {
+  // Function to close sidebar when marker is clicked
+  const closeSidebar = () => {
+    // Import store and close sidebar if it's expanded
+    import('@/features/sidebar/state/sidebarStore').then(({ useSidebarState }) => {
+      const { collapsed, toggle } = useSidebarState.getState()
+      if (!collapsed) {
+        toggle()
+      }
+    })
+  }
   const markers: Marker[] = []
   let trackedMarker: Marker | null = null
 
@@ -63,6 +73,9 @@ export function renderDeviceMarkers(
     markerEl.style.userSelect = 'none'
     markerEl.innerText = pos.device_icon || '📍'
     
+    // Add click event to close sidebar
+    markerEl.addEventListener('click', closeSidebar)
+    
     // Use custom element but NO ANCHOR specified = default positioning behavior
     const marker = new maplibregl.Marker({ element: markerEl })
       .setLngLat([lng, lat])
@@ -104,6 +117,9 @@ export function renderDeviceMarkers(
         const ring = document.createElement('div')
         ring.className = 'pulse-ring'
         trackedEl.appendChild(ring)
+        
+        // Add click event to close sidebar
+        trackedEl.addEventListener('click', closeSidebar)
         
         // Use custom element but NO ANCHOR specified = default positioning behavior
         trackedMarker = new maplibregl.Marker({ element: trackedEl })
