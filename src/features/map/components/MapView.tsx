@@ -117,10 +117,11 @@ export function MapView() {
   // Pass all positions to the tracking flow (it will filter invalid coordinates internally)
   useDeviceTrackingFlow(mapInstance.current, positions, (deviceRoute || []) as any, trackedDeviceId)
 
-  // initialize map instance
+  // Initialize map with default center
   useEffect(() => {
     if (!mapRef.current || mapInstance.current) return
 
+    // Map initialization
     const map = initMap(mapRef.current)
     mapInstance.current = map
 

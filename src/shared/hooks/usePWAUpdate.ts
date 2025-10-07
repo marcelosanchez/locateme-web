@@ -22,13 +22,18 @@ export function usePWAUpdate(): UsePWAUpdateReturn {
     navigator.serviceWorker.getRegistration().then((registration) => {
       if (!registration) return
 
-      // Check for updates every 5 minutes
-      const interval = setInterval(() => {
-        registration.update()
-      }, 300000) // 5 minutes
+      // Check for updates cada 5 minutos (menos agresivo)
+      const interval = setInterval(async () => {
+        try {
+          await registration.update()
+        } catch (error) {
+          console.warn('Update check failed:', error)
+        }
+      }, 300000) // 5 minutos
 
       // Listen for new service worker
       registration.addEventListener('updatefound', () => {
+        console.log('📱 New service worker found!')
         const newWorker = registration.installing
         if (!newWorker) return
 
@@ -43,12 +48,14 @@ export function usePWAUpdate(): UsePWAUpdateReturn {
 
       // Listen for controlling service worker change
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        // Service worker updated, reload the page
+        // Simple reload
         window.location.reload()
       })
 
       return () => clearInterval(interval)
     })
+
+
   }, [])
 
   // Update service worker

@@ -24,34 +24,41 @@ export function useInitialMapFocus(map: maplibregl.Map | null, mapReady: boolean
     }
   }, [currentlySelectedDeviceId, defaultDeviceId])
 
-  // Optimized geolocation effect
+  // Geolocation effect - simple mobile support
   useEffect(() => {
     if (!map || hasFlownToBrowser) return
     
-    // If we already have user location, use it immediately
+    // If we have cached location, use it immediately
     if (userLocation) {
       const center = [userLocation.longitude, userLocation.latitude] as [number, number]
-      map.flyTo({ center, zoom: 16 })
+      map.jumpTo({ center, zoom: 16 })
       setCenter(center)
       setHasFlownToBrowser(true)
       return
     }
-
-    // Otherwise request location with optimized hook
-    requestLocation()
-      .then(() => {
-        const location = userLocation as any
-        if (location) {
-          const center = [location.longitude, location.latitude] as [number, number]
-          map.flyTo({ center, zoom: 16 })
-          setCenter(center)
-        }
-        setHasFlownToBrowser(true)
-      })
-      .catch(() => {
-        // Fallback: set as flown anyway to continue with default device
-        setHasFlownToBrowser(true)
-      })
+    
+    // For mobile devices, try to get location once
+    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    
+    if (isMobile) {
+      requestLocation({ allowFallback: true })
+        .then((location) => {
+          if (location) {
+            const center = [location.longitude, location.latitude] as [number, number]
+            map.jumpTo({ center, zoom: 16 })
+            setCenter(center)
+          }
+        })
+        .catch(() => {
+          // Silent fail - no problem if location doesn't work
+        })
+        .finally(() => {
+          setHasFlownToBrowser(true)
+        })
+    } else {
+      // Desktop: don't request location, just continue
+      setHasFlownToBrowser(true)
+    }
   }, [map, hasFlownToBrowser, userLocation, requestLocation, setCenter])
 
   useEffect(() => {

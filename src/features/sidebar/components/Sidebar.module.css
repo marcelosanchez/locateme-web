@@ -101,3 +101,38 @@
 .logoutButton:hover {
   background-color: rgba(255, 255, 255, 0.15);
 }
+
+.versionText {
+  width: 100%;
+  margin-top: 8px;
+  text-align: center;
+  font-size: 0.6rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+  user-select: none;
+}
+
+.versionText:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.versionText.updateAvailable {
+  color: #22c55e !important;
+  animation: pulse 2s ease-in-out infinite alternate;
+}
+
+.versionText.updating {
+  color: #f59e0b !important;
+  cursor: wait !important;
+}
+
+@keyframes pulse {
+  from {
+    opacity: 0.6;
+  }
+  to {
+    opacity: 1;
+  }
+}

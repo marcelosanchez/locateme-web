@@ -7,7 +7,7 @@ import { useMapStore } from '../state/mapStore'
 interface UseMapOptimizedReturn {
   // User location
   userLocation: ReturnType<typeof useUserLocationOptimized>['userLocation']
-  requestUserLocation: () => Promise<void>
+  requestUserLocation: () => Promise<ReturnType<typeof useUserLocationOptimized>['userLocation']>
   
   // All device positions for map
   allPositions: ReturnType<typeof useMapPositionsOptimized>['positions']
@@ -82,11 +82,13 @@ export function useMapOptimized(): UseMapOptimizedReturn {
   }, [selectedDevice.selectDevice, selectedDevice.selectedDevice, setCenter, map])
 
   // Auto-center on user location when map loads (if no selected device)
-  useEffect(() => {
-    if (!selectedDevice.selectedDevice && userLocation.userLocation && map) {
-      centerOnUser()
-    }
-  }, [userLocation.userLocation, selectedDevice.selectedDevice, map])
+  // DISABLED: This was causing conflicts with device tracking on iPhone
+  // iPhone updates userLocation frequently, causing unwanted auto-centering during tracking
+  // useEffect(() => {
+  //   if (!selectedDevice.selectedDevice && userLocation.userLocation && map) {
+  //     centerOnUser()
+  //   }
+  // }, [userLocation.userLocation, selectedDevice.selectedDevice, map])
 
   // Auto-center on selected device when it changes
   useEffect(() => {

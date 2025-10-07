@@ -3,10 +3,31 @@ import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { VitePWA } from 'vite-plugin-pwa'
+import { writeFileSync } from 'fs'
+import { join } from 'path'
 
 // Get version from package.json
 import packageJson from './package.json'
 const appVersion = process.env.VITE_APP_VERSION || packageJson.version
+
+// Generate version.json for mobile update detection
+const generateVersionFile = () => ({
+  name: 'generate-version',
+  buildStart() {
+    const versionInfo = {
+      version: appVersion,
+      buildTime: new Date().toISOString(),
+      hash: Math.random().toString(36).substring(2, 15)
+    }
+    
+    writeFileSync(
+      join(__dirname, 'public', 'version.json'),
+      JSON.stringify(versionInfo, null, 2)
+    )
+    
+    console.log('📱 Generated version.json:', versionInfo)
+  }
+})
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -14,6 +35,7 @@ export default defineConfig({
     'import.meta.env.VITE_APP_VERSION': JSON.stringify(appVersion)
   },
   plugins: [
+    generateVersionFile(),
     react(),
     tailwindcss(),
     tsconfigPaths(),

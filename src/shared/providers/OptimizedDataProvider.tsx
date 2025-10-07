@@ -69,10 +69,8 @@ export function OptimizedDataProvider({ children, enabled = true }: OptimizedDat
   // Auto-start polling when token is available
   useEffect(() => {
     if (token && enabled) {
-      console.log('[OptimizedDataProvider] Starting adaptive polling')
       startPolling()
     } else {
-      console.log('[OptimizedDataProvider] Stopping polling (no token or disabled)')
       stopPolling()
     }
   }, [token, enabled, startPolling, stopPolling])

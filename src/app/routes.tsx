@@ -12,13 +12,18 @@ import { PWAUpdateBanner } from '@/shared/components/PWAUpdateBanner'
 
 // layout component to protect routes
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  const { user, token } = useSession()
+  const { user, token, isHydrated } = useSession()
   const { loading } = useSessionValidator()
   
   // Enable global auth interceptor
   useGlobalAuthInterceptor()
 
-  // Immediate redirect if no token or user
+  // Wait for hydration before making routing decisions
+  if (!isHydrated) {
+    return <div className="text-white p-4">Cargando sesión...</div>
+  }
+
+  // Immediate redirect if no token or user (after hydration)
   if (!token || !user) {
     return <Navigate to="/login" replace />
   }

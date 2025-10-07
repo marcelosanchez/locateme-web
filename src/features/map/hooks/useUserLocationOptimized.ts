@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { MapCache } from '@/config/map.config'
 
 export interface UserLocation {
   latitude: number
@@ -11,7 +12,7 @@ interface UseUserLocationOptimizedReturn {
   userLocation: UserLocation | null
   isLoading: boolean
   error: string | null
-  requestLocation: () => Promise<void>
+  requestLocation: (options?: { allowFallback?: boolean }) => Promise<UserLocation>
   isSupported: boolean
   hasPermission: boolean | null
   lastUpdate: Date | null
@@ -69,22 +70,9 @@ export function useUserLocationOptimized(): UseUserLocationOptimizedReturn {
       })
   }, [isSupported])
 
-  const requestLocation = useCallback(async (): Promise<void> => {
-    if (!isSupported) {
-      setError('Geolocation is not supported by this browser')
-      return Promise.reject(new Error('Geolocation not supported'))
-    }
-
-    setIsLoading(true)
-    setError(null)
-
-    return new Promise((resolve, reject) => {
-      const options: PositionOptions = {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 300000 // 5 minutes cache for GPS
-      }
-
+  // Helper function to get location with specific options
+  const getCurrentPositionPromise = useCallback((options: PositionOptions): Promise<UserLocation> => {
+    return new Promise<UserLocation>((resolve, reject) => {
       const successCallback = (position: GeolocationPosition) => {
         const location: UserLocation = {
           latitude: position.coords.latitude,
@@ -92,53 +80,173 @@ export function useUserLocationOptimized(): UseUserLocationOptimizedReturn {
           accuracy: position.coords.accuracy,
           timestamp: position.timestamp
         }
-        
+        resolve(location)
+      }
+
+      const errorCallback = (error: GeolocationPositionError) => {
+        reject(error)
+      }
+
+      navigator.geolocation.getCurrentPosition(successCallback, errorCallback, options)
+    })
+  }, [])
+
+
+
+  // OSM Nominatim API fallback for location
+  const getLocationFromOSM = useCallback(async (): Promise<UserLocation> => {
+    try {
+      // Get IP-based location using a free service
+      const ipResponse = await fetch('https://ipapi.co/json/', {
+        timeout: 5000
+      } as any)
+      
+      if (!ipResponse.ok) {
+        throw new Error('IP location service failed')
+      }
+      
+      const ipData = await ipResponse.json()
+      
+      if (ipData.latitude && ipData.longitude) {
+        return {
+          latitude: ipData.latitude,
+          longitude: ipData.longitude,
+          accuracy: 10000, // Low accuracy for IP-based location
+          timestamp: Date.now()
+        }
+      }
+      
+      throw new Error('No coordinates from IP service')
+    } catch (error) {
+      // Fallback to a default location (center map - South America)
+      console.warn('IP location failed, using default center:', error)
+      return {
+        latitude: -15.0,
+        longitude: -59.0,
+        accuracy: 50000, // Very low accuracy for default
+        timestamp: Date.now()
+      }
+    }
+  }, [])
+
+  const requestLocation = useCallback(async (options: { allowFallback?: boolean } = {}): Promise<UserLocation> => {
+    const { allowFallback = false } = options
+    
+    if (!isSupported) {
+      // No GPS support - only use OSM fallback if explicitly allowed (initial load)
+      if (allowFallback) {
+        const location = await getLocationFromOSM()
         setUserLocation(location)
         setLastUpdate(new Date())
         setIsLoading(false)
-        setHasPermission(true)
         
-        // Store in localStorage with expiration
         try {
           localStorage.setItem('userLocation', JSON.stringify(location))
         } catch (error) {
           console.warn('Failed to store user location:', error)
         }
         
-        resolve()
-      }
-
-      const errorCallback = (error: GeolocationPositionError) => {
-        let errorMessage = 'Unable to retrieve location'
+        // Preload map tiles around fallback location in background
+        MapCache.preloadTilesAroundLocation(location.longitude, location.latitude)
+          .catch(() => {
+            // Silent fail - tile preloading is an enhancement
+          })
         
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage = 'Location access denied. Please enable location permissions.'
-            setHasPermission(false)
-            break
-          case error.POSITION_UNAVAILABLE:
-            errorMessage = 'Location information unavailable. Please check your GPS settings.'
-            break
-          case error.TIMEOUT:
-            errorMessage = 'Location request timeout. Please try again.'
-            break
-          default:
-            errorMessage = 'An unknown error occurred while retrieving location.'
+        return location
+      } else {
+        throw new Error('Geolocation not supported and fallback not allowed')
+      }
+    }
+
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const geoOptions: PositionOptions = {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000 // 5 minutes cache
+      }
+      
+      const location = await getCurrentPositionPromise(geoOptions)
+      
+      // Update state
+      setUserLocation(location)
+      setLastUpdate(new Date())
+      setIsLoading(false)
+      setHasPermission(true)
+      
+      // Store in localStorage
+      try {
+        localStorage.setItem('userLocation', JSON.stringify(location))
+      } catch (error) {
+        console.warn('Failed to store user location:', error)
+      }
+      
+      // Preload map tiles around user location in background
+      MapCache.preloadTilesAroundLocation(location.longitude, location.latitude)
+        .catch(() => {
+          // Silent fail - tile preloading is an enhancement
+        })
+      
+      return location
+      
+    } catch (error) {
+      // GPS failed - only try OSM fallback if explicitly allowed (initial load)
+      if (allowFallback) {
+        console.log('GPS failed, trying OSM fallback for initial load...')
+        
+        try {
+          const fallbackLocation = await getLocationFromOSM()
+          
+          setUserLocation(fallbackLocation)
+          setLastUpdate(new Date())
+          setIsLoading(false)
+          setError(null) // Clear error since we got a fallback
+          
+          try {
+            localStorage.setItem('userLocation', JSON.stringify(fallbackLocation))
+          } catch (error) {
+            console.warn('Failed to store fallback location:', error)
+          }
+          
+          // Preload map tiles around fallback location in background
+          MapCache.preloadTilesAroundLocation(fallbackLocation.longitude, fallbackLocation.latitude)
+            .catch(() => {
+              // Silent fail - tile preloading is an enhancement
+            })
+          
+          return fallbackLocation
+          
+        } catch (fallbackError) {
+          console.warn('OSM fallback also failed:', fallbackError)
+          // Continue to handle GPS error below
         }
-        
-        setError(errorMessage)
-        setIsLoading(false)
-        
-        reject(new Error(errorMessage))
       }
 
-      navigator.geolocation.getCurrentPosition(
-        successCallback,
-        errorCallback,
-        options
-      )
-    })
-  }, [isSupported])
+      // Handle GPS error (either fallback not allowed or fallback also failed)
+      const geolocationError = error as GeolocationPositionError
+      let errorMessage = 'Unable to retrieve location'
+      
+      switch (geolocationError.code) {
+        case geolocationError.PERMISSION_DENIED:
+          errorMessage = 'Location access denied'
+          setHasPermission(false)
+          break
+        case geolocationError.POSITION_UNAVAILABLE:
+          errorMessage = 'Location unavailable'
+          break
+        case geolocationError.TIMEOUT:
+          errorMessage = 'Location request timeout'
+          break
+      }
+      
+      setError(errorMessage)
+      setIsLoading(false)
+      
+      return Promise.reject(new Error(errorMessage))
+    }
+  }, [isSupported, getCurrentPositionPromise, getLocationFromOSM])
 
   // Disabled auto-request to prevent CoreLocationProvider errors
   // Users can manually request location when needed

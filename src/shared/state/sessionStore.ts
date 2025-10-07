@@ -14,8 +14,10 @@ export type User = {
 type SessionState = {
   user: User | null
   token: string | null
+  isHydrated: boolean
   setSession: (user: User, token: string) => void
   logout: () => void
+  setHydrated: (hydrated: boolean) => void
 }
 
 export const useSessionStore = create<SessionState>()(
@@ -23,12 +25,23 @@ export const useSessionStore = create<SessionState>()(
     (set) => ({
       user: null,
       token: null,
-      setSession: (user, token) => set({ user, token }),
+      isHydrated: false,
+      setSession: (user, token) => set({ user, token, isHydrated: true }),
       logout: () => set({ user: null, token: null }),
+      setHydrated: (hydrated) => set({ isHydrated: hydrated }),
     }),
     {
       name: 'session-store',
       partialize: (state) => ({ user: state.user, token: state.token }),
+      onRehydrateStorage: () => {
+        return (state, error) => {
+          if (error) {
+            console.log('Session hydration error:', error)
+          } else {
+            state?.setHydrated(true)
+          }
+        }
+      },
     }
   )
 )
